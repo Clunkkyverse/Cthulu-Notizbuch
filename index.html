@@ -53,9 +53,18 @@
     width: 100%; background: #0c0f0a; color: var(--parchment); border: 1px solid var(--border);
     border-radius: 6px; padding: 8px 10px; font-family: var(--serif); font-size: 14px; outline: none;
   }
-  .check-row { display: flex; align-items: center; gap: 9px; font-size: 13.5px; margin-bottom: 12px; cursor: pointer; }
-  .check-row em { color: var(--ink-soft); }
   code { background: #0c0f0a; padding: 2px 6px; border-radius: 4px; color: var(--arcane); font-family: var(--mono); }
+
+  .setup-note {
+    font-size: 12.5px; color: var(--parchment); line-height: 1.6; background: #0c0f0a;
+    border: 1px solid var(--border); border-radius: 6px; padding: 11px 13px; margin-top: 4px;
+  }
+  .setup-note b { color: var(--gold); }
+  .mini-btn {
+    display: inline-flex; align-items: center; gap: 6px; font-family: var(--serif); font-size: 13px;
+    padding: 7px 13px; border-radius: 7px; cursor: pointer; margin-top: 10px;
+    background: transparent; color: var(--arcane); border: 1px solid var(--arcane-dim);
+  }
 
   /* Typ-Auswahl */
   .types { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
@@ -116,6 +125,11 @@
     border-radius: 6px; padding: 8px 10px; font-family: var(--mono); font-size: 11px; resize: vertical; outline: none;
   }
   .hint { font-size: 12px; color: var(--ink-soft); margin: 6px 0; line-height: 1.6; }
+  .preview-box {
+    margin-top: 14px; background: rgba(255,255,255,.18); border: 1px dashed rgba(74,66,48,.4);
+    border-radius: 6px; padding: 10px 12px; font-family: var(--mono); font-size: 12px;
+    color: var(--ink-soft); white-space: pre-wrap; line-height: 1.55;
+  }
 
   /* Toast */
   #toast {
@@ -145,31 +159,30 @@
     </svg>
     <div style="flex:1">
       <h1>Investigator&rsquo;s Journal</h1>
-      <p>Aufzeichnungen aus dem Mythos &middot; Vault: <span id="vaultLabel">Fipsi DnD</span></p>
+      <p>Alles in einer Seite &middot; <span id="targetLabel">Fipsi DnD / Claude Notizen/Kampagnen-Notizen</span></p>
     </div>
     <button class="icon-btn" id="settingsToggle" title="Einstellungen">&#9881;</button>
   </div>
 
   <!-- Einstellungen -->
   <div class="panel hidden" id="settingsPanel">
-    <div class="panel-title">&#9760; Verbindung zum Vault</div>
+    <div class="panel-title">&#9760; Ziel &amp; Einrichtung</div>
     <div class="field">
       <label>Vault-Name (exakt wie in Obsidian)</label>
       <input type="text" id="vault" />
     </div>
     <div class="field">
-      <label>Basisordner im Vault (leer = Wurzel)</label>
-      <input type="text" id="baseFolder" placeholder="z. B. Cthulhu" />
+      <label>Zielnotiz (Pfad ab Vault-Wurzel, ohne .md)</label>
+      <input type="text" id="filepath" placeholder="z. B. Claude Notizen/Kampagnen-Notizen" />
     </div>
-    <label class="check-row">
-      <input type="checkbox" id="useSubfolders" />
-      <span>Nach Notiz-Typ in Unterordner sortieren <em>(NSCs, Sitzungen &hellip;)</em></span>
-    </label>
-    <label class="check-row">
-      <input type="checkbox" id="datePrefix" />
-      <span>Datum dem Dateinamen voranstellen</span>
-    </label>
-    <p class="hint" style="margin-bottom:0">Zielpfad: <code id="pathPreview"></code></p>
+    <p class="hint" style="margin:0 0 4px">Aktueller Eintrag landet unter: <code id="pathPreview"></code></p>
+    <div class="setup-note">
+      <b>Einmalige Einrichtung:</b><br/>
+      1. In Obsidian das Plugin <b>&bdquo;Advanced URI&ldquo;</b> (von Vinzent03) installieren &amp; aktivieren.<br/>
+      2. Startnotiz mit den 6 Abschnitten erzeugen und in deinen Ordner legen:
+      <br/>
+      <button class="mini-btn" id="starterBtn">&#11015; Startnotiz herunterladen</button>
+    </div>
   </div>
 
   <!-- Typ-Auswahl -->
@@ -177,7 +190,7 @@
 
   <!-- Hauptkarte -->
   <div class="card">
-    <input type="text" class="title" id="title" placeholder="Titel der Aufzeichnung&hellip;" />
+    <input type="text" class="title" id="title" placeholder="Titel des Eintrags&hellip;" />
     <div class="tag-row">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a4230" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="#4a4230"/></svg>
       <input type="text" id="tags" placeholder="Tags durch Komma/Leerzeichen&hellip; (z. B. arkham-1920, dunwich)" />
@@ -186,13 +199,13 @@
     <textarea id="content" placeholder="Notiere deine Beobachtungen&hellip;
 
 Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></textarea>
+    <div class="preview-box" id="previewBox"></div>
   </div>
 
   <!-- Aktionen -->
   <div class="actions">
     <a class="btn-primary" id="saveBtn">&#128190; In Obsidian speichern</a>
     <button class="btn-ghost" id="copyBtn">&#128203; Link kopieren</button>
-    <button class="btn-ghost" id="downloadBtn">&#11015; Als .md</button>
     <button class="btn-ghost" id="clearBtn">&#10005; Leeren</button>
   </div>
 
@@ -205,7 +218,7 @@ Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></te
 
   <p class="hint" style="margin-top:16px">
     Beim ersten Klick fragt der Browser eventuell, ob Obsidian ge&ouml;ffnet werden darf &ndash; das best&auml;tigen.
-    Obsidian muss installiert und das Vault bekannt sein.
+    Voraussetzung: das Plugin &bdquo;Advanced URI&ldquo; ist aktiv und die Startnotiz existiert.
   </p>
 </div>
 
@@ -216,22 +229,20 @@ Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></te
   "use strict";
 
   var NOTE_TYPES = [
-    { id: "sitzung",    label: "Sitzungsprotokoll", subfolder: "Sitzungen",   defaultTags: ["sitzung"] },
-    { id: "nsc",        label: "NSC",               subfolder: "NSCs",        defaultTags: ["nsc"] },
-    { id: "schauplatz", label: "Schauplatz",        subfolder: "Schauplätze", defaultTags: ["ort"] },
-    { id: "hinweis",    label: "Hinweis",           subfolder: "Hinweise",    defaultTags: ["clue"] },
-    { id: "mythos",     label: "Mythos-Wissen",     subfolder: "Mythos",      defaultTags: ["mythos"] },
-    { id: "handout",    label: "Handout",           subfolder: "Handouts",    defaultTags: ["handout"] }
+    { id: "sitzung",    label: "Sitzungsprotokoll", defaultTags: ["sitzung"] },
+    { id: "nsc",        label: "NSC",               defaultTags: ["nsc"] },
+    { id: "schauplatz", label: "Schauplatz",        defaultTags: ["ort"] },
+    { id: "hinweis",    label: "Hinweis",           defaultTags: ["clue"] },
+    { id: "mythos",     label: "Mythos-Wissen",     defaultTags: ["mythos"] },
+    { id: "handout",    label: "Handout",           defaultTags: ["handout"] }
   ];
 
-  var SETTINGS_KEY = "ij_settings";
-  var DRAFT_KEY = "ij_draft";
+  var SETTINGS_KEY = "ij_settings_v2";
+  var DRAFT_KEY = "ij_draft_v2";
 
   var state = {
     vault: "Fipsi DnD",
-    baseFolder: "Cthulhu",
-    useSubfolders: true,
-    datePrefix: false,
+    filepath: "Claude Notizen/Kampagnen-Notizen",
     type: "sitzung",
     title: "",
     tags: "",
@@ -243,19 +254,18 @@ Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></te
     settingsToggle: document.getElementById("settingsToggle"),
     settingsPanel: document.getElementById("settingsPanel"),
     vault: document.getElementById("vault"),
-    vaultLabel: document.getElementById("vaultLabel"),
-    baseFolder: document.getElementById("baseFolder"),
-    useSubfolders: document.getElementById("useSubfolders"),
-    datePrefix: document.getElementById("datePrefix"),
+    filepath: document.getElementById("filepath"),
+    targetLabel: document.getElementById("targetLabel"),
     pathPreview: document.getElementById("pathPreview"),
+    starterBtn: document.getElementById("starterBtn"),
     types: document.getElementById("types"),
     title: document.getElementById("title"),
     tags: document.getElementById("tags"),
     chips: document.getElementById("chips"),
     content: document.getElementById("content"),
+    previewBox: document.getElementById("previewBox"),
     saveBtn: document.getElementById("saveBtn"),
     copyBtn: document.getElementById("copyBtn"),
-    downloadBtn: document.getElementById("downloadBtn"),
     clearBtn: document.getElementById("clearBtn"),
     linkPanel: document.getElementById("linkPanel"),
     rawLink: document.getElementById("rawLink"),
@@ -263,15 +273,13 @@ Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></te
   };
 
   // --- Persistenz ---
-  function loadSettings() {
+  function loadState() {
     try {
       var raw = localStorage.getItem(SETTINGS_KEY);
       if (raw) {
         var s = JSON.parse(raw);
         if (s.vault) state.vault = s.vault;
-        if (typeof s.baseFolder === "string") state.baseFolder = s.baseFolder;
-        if (typeof s.useSubfolders === "boolean") state.useSubfolders = s.useSubfolders;
-        if (typeof s.datePrefix === "boolean") state.datePrefix = s.datePrefix;
+        if (typeof s.filepath === "string") state.filepath = s.filepath;
       }
     } catch (e) {}
     try {
@@ -287,10 +295,7 @@ Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></te
   }
   function saveSettings() {
     try {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify({
-        vault: state.vault, baseFolder: state.baseFolder,
-        useSubfolders: state.useSubfolders, datePrefix: state.datePrefix
-      }));
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify({ vault: state.vault, filepath: state.filepath }));
     } catch (e) {}
   }
   function saveDraft() {
@@ -313,49 +318,31 @@ Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></te
     function p(n) { return String(n).padStart(2, "0"); }
     return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
   }
-  function sanitizeFilename(s) {
-    return s.replace(/[\\/:*?"<>|#^[\]]/g, "").replace(/\s+/g, " ").trim();
-  }
   function parseTags() {
     return state.tags.split(/[,\s]+/).map(function (t) {
       return t.replace(/^#/, "").trim();
     }).filter(Boolean);
   }
   function buildTags() {
-    var manual = parseTags();
-    var all = activeType().defaultTags.concat(manual);
+    var all = activeType().defaultTags.concat(parseTags());
     var seen = {}, out = [];
     for (var i = 0; i < all.length; i++) {
       if (!seen[all[i]]) { seen[all[i]] = true; out.push(all[i]); }
     }
     return out;
   }
-  function buildFrontmatter() {
-    var tags = buildTags();
-    var lines = ["---"];
-    lines.push("type: " + activeType().id);
-    lines.push('titel: "' + (state.title || "Unbenannt").replace(/"/g, "'") + '"');
-    if (tags.length) lines.push("tags: [" + tags.join(", ") + "]");
-    lines.push("erstellt: " + todayISO());
-    lines.push("---");
-    return lines.join("\n");
-  }
-  function buildFullContent() {
-    return buildFrontmatter() + "\n\n# " + (state.title || "Unbenannt") + "\n\n" + state.content + "\n";
-  }
-  function buildPath() {
-    var base = sanitizeFilename(state.title) || "Unbenannte Notiz";
-    var name = state.datePrefix ? (todayISO() + " " + base) : base;
-    var parts = [];
-    if (state.baseFolder.trim()) parts.push(state.baseFolder.trim());
-    if (state.useSubfolders) parts.push(activeType().subfolder);
-    parts.push(name);
-    return parts.join("/");
+  // Der Markdown-Block, der unter die passende Überschrift gehängt wird.
+  function buildEntry() {
+    var tags = buildTags().map(function (t) { return "#" + t; }).join(" ");
+    var meta = todayISO() + (tags ? "  " + tags : "");
+    return "\n### " + (state.title || "Unbenannt") + "\n*" + meta + "*\n\n" + state.content + "\n";
   }
   function buildUri() {
-    return "obsidian://new?vault=" + encodeURIComponent(state.vault) +
-           "&file=" + encodeURIComponent(buildPath()) +
-           "&content=" + encodeURIComponent(buildFullContent());
+    return "obsidian://advanced-uri?vault=" + encodeURIComponent(state.vault) +
+           "&filepath=" + encodeURIComponent(state.filepath) +
+           "&heading=" + encodeURIComponent(activeType().label) +
+           "&data=" + encodeURIComponent(buildEntry()) +
+           "&mode=append";
   }
   function hasContent() {
     return state.title.trim() !== "" || state.content.trim() !== "";
@@ -379,7 +366,7 @@ Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></te
       b.textContent = t.label;
       b.addEventListener("click", function () {
         state.type = t.id;
-        renderTypes(); renderChips(); renderPath(); renderLink(); saveDraft();
+        renderTypes(); renderChips(); renderPath(); renderPreview(); renderLink(); saveDraft();
       });
       el.types.appendChild(b);
     });
@@ -394,7 +381,11 @@ Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></te
     });
   }
   function renderPath() {
-    el.pathPreview.textContent = buildPath() + ".md";
+    el.pathPreview.textContent = state.filepath + ".md  →  ## " + activeType().label;
+    el.targetLabel.textContent = state.vault + " / " + state.filepath;
+  }
+  function renderPreview() {
+    el.previewBox.textContent = "Wird angehängt unter „## " + activeType().label + "“:\n" + buildEntry().replace(/^\n/, "");
   }
   function renderLink() {
     if (hasContent()) {
@@ -408,31 +399,27 @@ Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></te
   }
   function renderAll() {
     el.vault.value = state.vault;
-    el.vaultLabel.textContent = state.vault;
-    el.baseFolder.value = state.baseFolder;
-    el.useSubfolders.checked = state.useSubfolders;
-    el.datePrefix.checked = state.datePrefix;
+    el.filepath.value = state.filepath;
     el.title.value = state.title;
     el.tags.value = state.tags;
     el.content.value = state.content;
-    renderTypes(); renderChips(); renderPath(); renderLink();
+    renderTypes(); renderChips(); renderPath(); renderPreview(); renderLink();
   }
 
   // --- Aktionen ---
   function saveToObsidian(e) {
     if (!hasContent()) {
       if (e) e.preventDefault();
-      showToast("error", "Die Notiz ist leer – bitte zuerst etwas eintragen.");
+      showToast("error", "Der Eintrag ist leer – bitte zuerst etwas eintragen.");
       return;
     }
     el.saveBtn.href = buildUri();
-    // Der echte Link-Klick übernimmt die Navigation zu obsidian:// von selbst.
     setTimeout(function () {
-      showToast("success", "An Obsidian übergeben → " + buildPath() + ".md");
+      showToast("success", "Eingetragen unter „" + activeType().label + "“ in " + state.filepath + ".md");
     }, 250);
   }
   function copyLink() {
-    if (!hasContent()) { showToast("error", "Die Notiz ist leer – bitte zuerst etwas eintragen."); return; }
+    if (!hasContent()) { showToast("error", "Der Eintrag ist leer – bitte zuerst etwas eintragen."); return; }
     var uri = buildUri();
     function fallback() {
       try {
@@ -442,7 +429,7 @@ Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></te
         var ok = document.execCommand("copy");
         showToast(ok ? "success" : "error",
           ok ? "Obsidian-Link kopiert." : "Kopieren blockiert – Feld unten manuell markieren.");
-      } catch (e) {
+      } catch (err) {
         showToast("error", "Kopieren blockiert – Feld unten manuell markieren.");
       }
     }
@@ -454,24 +441,27 @@ Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></te
       fallback();
     }
   }
-  function downloadMd() {
-    if (!hasContent()) { showToast("error", "Die Notiz ist leer – bitte zuerst etwas eintragen."); return; }
-    var blob = new Blob([buildFullContent()], { type: "text/markdown;charset=utf-8" });
+  function downloadStarter() {
+    var md = "# Kampagnen-Notizen\n\n" + NOTE_TYPES.map(function (t) {
+      return "## " + t.label;
+    }).join("\n\n") + "\n";
+    var blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
     a.href = url;
-    a.download = (sanitizeFilename(state.title) || "Notiz") + ".md";
+    var parts = state.filepath.split("/");
+    a.download = (parts[parts.length - 1] || "Kampagnen-Notizen") + ".md";
     document.body.appendChild(a);
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    showToast("success", "Als .md heruntergeladen.");
+    showToast("success", "Startnotiz heruntergeladen – in den Ordner „Claude Notizen“ legen.");
   }
   function clearDraft() {
     state.title = ""; state.content = ""; state.tags = "";
     try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
     renderAll();
-    showToast("success", "Entwurf geleert.");
+    showToast("success", "Eingabe geleert.");
   }
 
   // --- Events ---
@@ -480,35 +470,28 @@ Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></te
     el.settingsToggle.classList.toggle("active");
   });
   el.vault.addEventListener("input", function () {
-    state.vault = el.vault.value; el.vaultLabel.textContent = state.vault;
-    renderPath(); renderLink(); saveSettings();
+    state.vault = el.vault.value; renderPath(); renderLink(); saveSettings();
   });
-  el.baseFolder.addEventListener("input", function () {
-    state.baseFolder = el.baseFolder.value; renderPath(); renderLink(); saveSettings();
-  });
-  el.useSubfolders.addEventListener("change", function () {
-    state.useSubfolders = el.useSubfolders.checked; renderPath(); renderLink(); saveSettings();
-  });
-  el.datePrefix.addEventListener("change", function () {
-    state.datePrefix = el.datePrefix.checked; renderPath(); renderLink(); saveSettings();
+  el.filepath.addEventListener("input", function () {
+    state.filepath = el.filepath.value; renderPath(); renderLink(); saveSettings();
   });
   el.title.addEventListener("input", function () {
-    state.title = el.title.value; renderPath(); renderLink(); saveDraft();
+    state.title = el.title.value; renderPreview(); renderLink(); saveDraft();
   });
   el.tags.addEventListener("input", function () {
-    state.tags = el.tags.value; renderChips(); renderLink(); saveDraft();
+    state.tags = el.tags.value; renderChips(); renderPreview(); renderLink(); saveDraft();
   });
   el.content.addEventListener("input", function () {
-    state.content = el.content.value; renderLink(); saveDraft();
+    state.content = el.content.value; renderPreview(); renderLink(); saveDraft();
   });
   el.saveBtn.addEventListener("click", saveToObsidian);
   el.copyBtn.addEventListener("click", copyLink);
-  el.downloadBtn.addEventListener("click", downloadMd);
   el.clearBtn.addEventListener("click", clearDraft);
+  el.starterBtn.addEventListener("click", downloadStarter);
   el.rawLink.addEventListener("click", function () { el.rawLink.select(); });
 
   // --- Start ---
-  loadSettings();
+  loadState();
   renderAll();
 })();
 </script>

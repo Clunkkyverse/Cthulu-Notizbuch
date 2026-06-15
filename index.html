@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Investigator's Journal</title>
+<style>
+  :root {
+    --bg-deep: #0a0d0b;
+    --bg-panel: #12160f;
+    --parchment: #e7dcc1;
+    --parchment-dark: #d6c8a2;
+    --ink: #1f1b12;
+    --ink-soft: #4a4230;
+    --arcane: #6f9466;
+    --arcane-dim: #3f5a3a;
+    --gold: #b89b5e;
+    --border: #2a3326;
+    --serif: 'Georgia', 'Iowan Old Style', 'Palatino Linotype', serif;
+    --mono: 'Courier New', monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg-deep);
+    color: var(--parchment);
+    font-family: var(--serif);
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 28px 18px 60px; }
+
+  /* Kopf */
+  .head { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+  .head h1 { margin: 0; font-size: 30px; letter-spacing: 1px; }
+  .head p { margin: 4px 0 0; font-size: 14px; color: var(--arcane); font-style: italic; }
+  .icon-btn {
+    background: transparent; color: var(--arcane); border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 11px; cursor: pointer; font-size: 16px;
+  }
+  .icon-btn.active { background: var(--arcane-dim); color: var(--parchment); border-color: var(--arcane); }
+
+  /* Panels */
+  .panel {
+    background: var(--bg-panel); border: 1px solid var(--border); border-radius: 9px;
+    padding: 18px; margin-bottom: 18px;
+  }
+  .panel-title {
+    font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold);
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; color: var(--arcane); margin-bottom: 5px; }
+  .field input[type="text"] {
+    width: 100%; background: #0c0f0a; color: var(--parchment); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 10px; font-family: var(--serif); font-size: 14px; outline: none;
+  }
+  .check-row { display: flex; align-items: center; gap: 9px; font-size: 13.5px; margin-bottom: 12px; cursor: pointer; }
+  .check-row em { color: var(--ink-soft); }
+  code { background: #0c0f0a; padding: 2px 6px; border-radius: 4px; color: var(--arcane); font-family: var(--mono); }
+
+  /* Typ-Auswahl */
+  .types { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .type-btn {
+    display: inline-flex; align-items: center; gap: 7px; font-family: var(--serif); font-size: 13.5px;
+    padding: 7px 13px; border-radius: 7px; cursor: pointer; background: transparent;
+    color: var(--arcane); border: 1px solid var(--border); transition: all .15s;
+  }
+  .type-btn.active { background: var(--arcane-dim); color: var(--parchment); border-color: var(--arcane); }
+
+  /* Hauptkarte */
+  .card {
+    background: linear-gradient(160deg, var(--parchment) 0%, var(--parchment-dark) 100%);
+    border-radius: 10px; padding: 22px 22px 24px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.55), inset 0 0 60px rgba(120,100,60,.18);
+    border: 1px solid var(--gold); color: var(--ink);
+  }
+  .card input.title {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(74,66,48,.33);
+    font-family: var(--serif); font-size: 24px; color: var(--ink); padding: 4px 2px 10px;
+    outline: none; margin-bottom: 16px;
+  }
+  .tag-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .tag-row svg { flex: 0 0 auto; }
+  .tag-row input {
+    flex: 1; background: transparent; border: none; font-family: var(--serif); font-size: 14px;
+    color: var(--ink-soft); outline: none; padding: 2px 0;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .chip {
+    font-size: 12px; background: rgba(63,90,58,.2); color: var(--ink-soft);
+    border: 1px solid rgba(63,90,58,.4); border-radius: 4px; padding: 2px 8px;
+  }
+  .card textarea {
+    width: 100%; background: rgba(255,255,255,.25); border: 1px solid rgba(74,66,48,.2);
+    border-radius: 6px; font-family: var(--mono); font-size: 14px; line-height: 1.6;
+    color: var(--ink); padding: 12px 14px; outline: none; resize: vertical; min-height: 240px;
+  }
+
+  /* Aktionen */
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px; font-family: var(--serif); font-size: 15px;
+    padding: 11px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;
+    background: linear-gradient(160deg, var(--arcane), var(--arcane-dim)); color: #0a0d0b;
+    border: 1px solid var(--gold); box-shadow: 0 6px 18px rgba(111,148,102,.3); text-decoration: none;
+  }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 7px; font-family: var(--serif); font-size: 14px;
+    padding: 11px 16px; border-radius: 8px; cursor: pointer; background: transparent;
+    color: var(--arcane); border: 1px solid var(--border); text-decoration: none;
+  }
+
+  .link-panel { margin-top: 18px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 9px; padding: 14px 16px; }
+  .link-panel .lp-title { font-size: 12px; color: var(--gold); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+  .link-panel textarea {
+    width: 100%; background: #0c0f0a; color: var(--arcane); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 10px; font-family: var(--mono); font-size: 11px; resize: vertical; outline: none;
+  }
+  .hint { font-size: 12px; color: var(--ink-soft); margin: 6px 0; line-height: 1.6; }
+
+  /* Toast */
+  #toast {
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+    border-radius: 8px; padding: 12px 18px; display: none; align-items: center; gap: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5); font-family: var(--serif); font-size: 14px; max-width: 90%;
+    color: var(--parchment);
+  }
+  #toast.success { display: flex; background: #12160f; border: 1px solid var(--arcane); }
+  #toast.warn { display: flex; background: #332a12; border: 1px solid var(--gold); }
+  #toast.error { display: flex; background: #3a1a14; border: 1px solid #a05548; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Kopf -->
+  <div class="head">
+    <svg width="62" height="62" viewBox="0 0 100 100" style="opacity:.85">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="#3f5a3a" stroke-width="1.2"/>
+      <circle cx="50" cy="50" r="34" fill="none" stroke="#3f5a3a" stroke-width="0.8"/>
+      <polygon points="50,8 88,72 12,72" fill="none" stroke="#3f5a3a" stroke-width="1"/>
+      <polygon points="50,92 12,28 88,28" fill="none" stroke="#3f5a3a" stroke-width="1"/>
+      <circle cx="50" cy="50" r="8" fill="none" stroke="#b89b5e" stroke-width="1"/>
+      <circle cx="50" cy="50" r="2.5" fill="#b89b5e"/>
+    </svg>
+    <div style="flex:1">
+      <h1>Investigator&rsquo;s Journal</h1>
+      <p>Aufzeichnungen aus dem Mythos &middot; Vault: <span id="vaultLabel">Fipsi DnD</span></p>
+    </div>
+    <button class="icon-btn" id="settingsToggle" title="Einstellungen">&#9881;</button>
+  </div>
+
+  <!-- Einstellungen -->
+  <div class="panel hidden" id="settingsPanel">
+    <div class="panel-title">&#9760; Verbindung zum Vault</div>
+    <div class="field">
+      <label>Vault-Name (exakt wie in Obsidian)</label>
+      <input type="text" id="vault" />
+    </div>
+    <div class="field">
+      <label>Basisordner im Vault (leer = Wurzel)</label>
+      <input type="text" id="baseFolder" placeholder="z. B. Cthulhu" />
+    </div>
+    <label class="check-row">
+      <input type="checkbox" id="useSubfolders" />
+      <span>Nach Notiz-Typ in Unterordner sortieren <em>(NSCs, Sitzungen &hellip;)</em></span>
+    </label>
+    <label class="check-row">
+      <input type="checkbox" id="datePrefix" />
+      <span>Datum dem Dateinamen voranstellen</span>
+    </label>
+    <p class="hint" style="margin-bottom:0">Zielpfad: <code id="pathPreview"></code></p>
+  </div>
+
+  <!-- Typ-Auswahl -->
+  <div class="types" id="types"></div>
+
+  <!-- Hauptkarte -->
+  <div class="card">
+    <input type="text" class="title" id="title" placeholder="Titel der Aufzeichnung&hellip;" />
+    <div class="tag-row">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a4230" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="#4a4230"/></svg>
+      <input type="text" id="tags" placeholder="Tags durch Komma/Leerzeichen&hellip; (z. B. arkham-1920, dunwich)" />
+    </div>
+    <div class="chips" id="chips"></div>
+    <textarea id="content" placeholder="Notiere deine Beobachtungen&hellip;
+
+Markdown wird unterstützt: **fett**, *kursiv*, - Listen, [[Verlinkungen]]"></textarea>
+  </div>
+
+  <!-- Aktionen -->
+  <div class="actions">
+    <a class="btn-primary" id="saveBtn">&#128190; In Obsidian speichern</a>
+    <button class="btn-ghost" id="copyBtn">&#128203; Link kopieren</button>
+    <button class="btn-ghost" id="downloadBtn">&#11015; Als .md</button>
+    <button class="btn-ghost" id="clearBtn">&#10005; Leeren</button>
+  </div>
+
+  <!-- Link-Fallback -->
+  <div class="link-panel hidden" id="linkPanel">
+    <div class="lp-title">Obsidian-Link (Notnagel)</div>
+    <div class="hint">Feld anklicken (markiert alles), kopieren und in einem Browser-Tab einf&uuml;gen.</div>
+    <textarea id="rawLink" readonly rows="3"></textarea>
+  </div>
+
+  <p class="hint" style="margin-top:16px">
+    Beim ersten Klick fragt der Browser eventuell, ob Obsidian ge&ouml;ffnet werden darf &ndash; das best&auml;tigen.
+    Obsidian muss installiert und das Vault bekannt sein.
+  </p>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var NOTE_TYPES = [
+    { id: "sitzung",    label: "Sitzungsprotokoll", subfolder: "Sitzungen",   defaultTags: ["sitzung"] },
+    { id: "nsc",        label: "NSC",               subfolder: "NSCs",        defaultTags: ["nsc"] },
+    { id: "schauplatz", label: "Schauplatz",        subfolder: "Schauplätze", defaultTags: ["ort"] },
+    { id: "hinweis",    label: "Hinweis",           subfolder: "Hinweise",    defaultTags: ["clue"] },
+    { id: "mythos",     label: "Mythos-Wissen",     subfolder: "Mythos",      defaultTags: ["mythos"] },
+    { id: "handout",    label: "Handout",           subfolder: "Handouts",    defaultTags: ["handout"] }
+  ];
+
+  var SETTINGS_KEY = "ij_settings";
+  var DRAFT_KEY = "ij_draft";
+
+  var state = {
+    vault: "Fipsi DnD",
+    baseFolder: "Cthulhu",
+    useSubfolders: true,
+    datePrefix: false,
+    type: "sitzung",
+    title: "",
+    tags: "",
+    content: ""
+  };
+
+  // --- DOM ---
+  var el = {
+    settingsToggle: document.getElementById("settingsToggle"),
+    settingsPanel: document.getElementById("settingsPanel"),
+    vault: document.getElementById("vault"),
+    vaultLabel: document.getElementById("vaultLabel"),
+    baseFolder: document.getElementById("baseFolder"),
+    useSubfolders: document.getElementById("useSubfolders"),
+    datePrefix: document.getElementById("datePrefix"),
+    pathPreview: document.getElementById("pathPreview"),
+    types: document.getElementById("types"),
+    title: document.getElementById("title"),
+    tags: document.getElementById("tags"),
+    chips: document.getElementById("chips"),
+    content: document.getElementById("content"),
+    saveBtn: document.getElementById("saveBtn"),
+    copyBtn: document.getElementById("copyBtn"),
+    downloadBtn: document.getElementById("downloadBtn"),
+    clearBtn: document.getElementById("clearBtn"),
+    linkPanel: document.getElementById("linkPanel"),
+    rawLink: document.getElementById("rawLink"),
+    toast: document.getElementById("toast")
+  };
+
+  // --- Persistenz ---
+  function loadSettings() {
+    try {
+      var raw = localStorage.getItem(SETTINGS_KEY);
+      if (raw) {
+        var s = JSON.parse(raw);
+        if (s.vault) state.vault = s.vault;
+        if (typeof s.baseFolder === "string") state.baseFolder = s.baseFolder;
+        if (typeof s.useSubfolders === "boolean") state.useSubfolders = s.useSubfolders;
+        if (typeof s.datePrefix === "boolean") state.datePrefix = s.datePrefix;
+      }
+    } catch (e) {}
+    try {
+      var rawD = localStorage.getItem(DRAFT_KEY);
+      if (rawD) {
+        var d = JSON.parse(rawD);
+        if (d.type) state.type = d.type;
+        if (d.title) state.title = d.title;
+        if (d.tags) state.tags = d.tags;
+        if (d.content) state.content = d.content;
+      }
+    } catch (e) {}
+  }
+  function saveSettings() {
+    try {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+        vault: state.vault, baseFolder: state.baseFolder,
+        useSubfolders: state.useSubfolders, datePrefix: state.datePrefix
+      }));
+    } catch (e) {}
+  }
+  function saveDraft() {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({
+        type: state.type, title: state.title, tags: state.tags, content: state.content
+      }));
+    } catch (e) {}
+  }
+
+  // --- Helfer ---
+  function activeType() {
+    for (var i = 0; i < NOTE_TYPES.length; i++) {
+      if (NOTE_TYPES[i].id === state.type) return NOTE_TYPES[i];
+    }
+    return NOTE_TYPES[0];
+  }
+  function todayISO() {
+    var d = new Date();
+    function p(n) { return String(n).padStart(2, "0"); }
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+  }
+  function sanitizeFilename(s) {
+    return s.replace(/[\\/:*?"<>|#^[\]]/g, "").replace(/\s+/g, " ").trim();
+  }
+  function parseTags() {
+    return state.tags.split(/[,\s]+/).map(function (t) {
+      return t.replace(/^#/, "").trim();
+    }).filter(Boolean);
+  }
+  function buildTags() {
+    var manual = parseTags();
+    var all = activeType().defaultTags.concat(manual);
+    var seen = {}, out = [];
+    for (var i = 0; i < all.length; i++) {
+      if (!seen[all[i]]) { seen[all[i]] = true; out.push(all[i]); }
+    }
+    return out;
+  }
+  function buildFrontmatter() {
+    var tags = buildTags();
+    var lines = ["---"];
+    lines.push("type: " + activeType().id);
+    lines.push('titel: "' + (state.title || "Unbenannt").replace(/"/g, "'") + '"');
+    if (tags.length) lines.push("tags: [" + tags.join(", ") + "]");
+    lines.push("erstellt: " + todayISO());
+    lines.push("---");
+    return lines.join("\n");
+  }
+  function buildFullContent() {
+    return buildFrontmatter() + "\n\n# " + (state.title || "Unbenannt") + "\n\n" + state.content + "\n";
+  }
+  function buildPath() {
+    var base = sanitizeFilename(state.title) || "Unbenannte Notiz";
+    var name = state.datePrefix ? (todayISO() + " " + base) : base;
+    var parts = [];
+    if (state.baseFolder.trim()) parts.push(state.baseFolder.trim());
+    if (state.useSubfolders) parts.push(activeType().subfolder);
+    parts.push(name);
+    return parts.join("/");
+  }
+  function buildUri() {
+    return "obsidian://new?vault=" + encodeURIComponent(state.vault) +
+           "&file=" + encodeURIComponent(buildPath()) +
+           "&content=" + encodeURIComponent(buildFullContent());
+  }
+  function hasContent() {
+    return state.title.trim() !== "" || state.content.trim() !== "";
+  }
+
+  // --- Toast ---
+  var toastTimer = null;
+  function showToast(type, msg) {
+    el.toast.textContent = msg;
+    el.toast.className = type;
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.toast.className = ""; }, 3600);
+  }
+
+  // --- Render ---
+  function renderTypes() {
+    el.types.innerHTML = "";
+    NOTE_TYPES.forEach(function (t) {
+      var b = document.createElement("button");
+      b.className = "type-btn" + (t.id === state.type ? " active" : "");
+      b.textContent = t.label;
+      b.addEventListener("click", function () {
+        state.type = t.id;
+        renderTypes(); renderChips(); renderPath(); renderLink(); saveDraft();
+      });
+      el.types.appendChild(b);
+    });
+  }
+  function renderChips() {
+    el.chips.innerHTML = "";
+    buildTags().forEach(function (t) {
+      var s = document.createElement("span");
+      s.className = "chip";
+      s.textContent = "#" + t;
+      el.chips.appendChild(s);
+    });
+  }
+  function renderPath() {
+    el.pathPreview.textContent = buildPath() + ".md";
+  }
+  function renderLink() {
+    if (hasContent()) {
+      el.linkPanel.classList.remove("hidden");
+      el.rawLink.value = buildUri();
+      el.saveBtn.href = buildUri();
+    } else {
+      el.linkPanel.classList.add("hidden");
+      el.saveBtn.removeAttribute("href");
+    }
+  }
+  function renderAll() {
+    el.vault.value = state.vault;
+    el.vaultLabel.textContent = state.vault;
+    el.baseFolder.value = state.baseFolder;
+    el.useSubfolders.checked = state.useSubfolders;
+    el.datePrefix.checked = state.datePrefix;
+    el.title.value = state.title;
+    el.tags.value = state.tags;
+    el.content.value = state.content;
+    renderTypes(); renderChips(); renderPath(); renderLink();
+  }
+
+  // --- Aktionen ---
+  function saveToObsidian(e) {
+    if (!hasContent()) {
+      if (e) e.preventDefault();
+      showToast("error", "Die Notiz ist leer – bitte zuerst etwas eintragen.");
+      return;
+    }
+    el.saveBtn.href = buildUri();
+    // Der echte Link-Klick übernimmt die Navigation zu obsidian:// von selbst.
+    setTimeout(function () {
+      showToast("success", "An Obsidian übergeben → " + buildPath() + ".md");
+    }, 250);
+  }
+  function copyLink() {
+    if (!hasContent()) { showToast("error", "Die Notiz ist leer – bitte zuerst etwas eintragen."); return; }
+    var uri = buildUri();
+    function fallback() {
+      try {
+        el.rawLink.value = uri;
+        el.rawLink.focus();
+        el.rawLink.select();
+        var ok = document.execCommand("copy");
+        showToast(ok ? "success" : "error",
+          ok ? "Obsidian-Link kopiert." : "Kopieren blockiert – Feld unten manuell markieren.");
+      } catch (e) {
+        showToast("error", "Kopieren blockiert – Feld unten manuell markieren.");
+      }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(uri).then(function () {
+        showToast("success", "Obsidian-Link kopiert.");
+      }).catch(fallback);
+    } else {
+      fallback();
+    }
+  }
+  function downloadMd() {
+    if (!hasContent()) { showToast("error", "Die Notiz ist leer – bitte zuerst etwas eintragen."); return; }
+    var blob = new Blob([buildFullContent()], { type: "text/markdown;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = (sanitizeFilename(state.title) || "Notiz") + ".md";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast("success", "Als .md heruntergeladen.");
+  }
+  function clearDraft() {
+    state.title = ""; state.content = ""; state.tags = "";
+    try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+    renderAll();
+    showToast("success", "Entwurf geleert.");
+  }
+
+  // --- Events ---
+  el.settingsToggle.addEventListener("click", function () {
+    el.settingsPanel.classList.toggle("hidden");
+    el.settingsToggle.classList.toggle("active");
+  });
+  el.vault.addEventListener("input", function () {
+    state.vault = el.vault.value; el.vaultLabel.textContent = state.vault;
+    renderPath(); renderLink(); saveSettings();
+  });
+  el.baseFolder.addEventListener("input", function () {
+    state.baseFolder = el.baseFolder.value; renderPath(); renderLink(); saveSettings();
+  });
+  el.useSubfolders.addEventListener("change", function () {
+    state.useSubfolders = el.useSubfolders.checked; renderPath(); renderLink(); saveSettings();
+  });
+  el.datePrefix.addEventListener("change", function () {
+    state.datePrefix = el.datePrefix.checked; renderPath(); renderLink(); saveSettings();
+  });
+  el.title.addEventListener("input", function () {
+    state.title = el.title.value; renderPath(); renderLink(); saveDraft();
+  });
+  el.tags.addEventListener("input", function () {
+    state.tags = el.tags.value; renderChips(); renderLink(); saveDraft();
+  });
+  el.content.addEventListener("input", function () {
+    state.content = el.content.value; renderLink(); saveDraft();
+  });
+  el.saveBtn.addEventListener("click", saveToObsidian);
+  el.copyBtn.addEventListener("click", copyLink);
+  el.downloadBtn.addEventListener("click", downloadMd);
+  el.clearBtn.addEventListener("click", clearDraft);
+  el.rawLink.addEventListener("click", function () { el.rawLink.select(); });
+
+  // --- Start ---
+  loadSettings();
+  renderAll();
+})();
+</script>
+</body>
+</html>

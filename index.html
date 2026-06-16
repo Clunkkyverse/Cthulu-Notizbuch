@@ -76,7 +76,6 @@
   /* ── Kopf ────────────────────────────────────────────────────────────────── */
   .head { display: flex; align-items: flex-start; gap: 22px; margin-bottom: 4px; position: relative; }
   .sigil-wrap { position: relative; flex: 0 0 auto; padding: 9px; }
-  /* Art-déco stepped Rahmen um das Sigil */
   .sigil-wrap::before, .sigil-wrap::after {
     content: ""; position: absolute; inset: 0; pointer-events: none;
     border: 1px solid var(--brass-dim);
@@ -128,6 +127,17 @@
   .field input[type="text"]:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(113,145,106,.14); }
   code { background: #090c08; padding: 3px 7px; border-radius: 4px; color: var(--green-bright); font-family: var(--type); font-size: 12px; border: 1px solid var(--border); }
 
+  /* Spieler-Verwaltung */
+  .onboard { font-family: var(--type); font-size: 11.5px; color: var(--brass-bright); line-height: 1.7; margin: -6px 0 16px; padding: 10px 12px; background: rgba(48,90,78,.12); border: 1px dashed var(--brass-dim); border-radius: 4px; }
+  .roster-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+  .roster-row { display: flex; gap: 8px; align-items: center; }
+  .roster-row input { flex: 1; min-width: 0; background: #090c08; color: var(--paper); border: 1px solid var(--border); border-radius: 4px; padding: 9px 11px; font-family: var(--type); font-size: 12.5px; outline: none; transition: border-color .15s; }
+  .roster-row input:focus { border-color: var(--green); }
+  .roster-remove { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 4px; background: rgba(124,43,33,.16); color: var(--wax-hi); border: 1px solid rgba(124,43,33,.5); cursor: pointer; font-size: 17px; line-height: 1; transition: all .15s; }
+  .roster-remove:hover { background: rgba(124,43,33,.32); color: #fff; }
+  .add-player { font-family: var(--type); font-size: 12px; letter-spacing: .6px; color: var(--green); background: rgba(15,20,14,.55); border: 1px dashed var(--brass-dim); border-radius: 4px; padding: 9px 15px; cursor: pointer; transition: all .15s; }
+  .add-player:hover { color: var(--paper); border-color: var(--green); }
+
   /* ── Tabs als Aktenreiter ─────────────────────────────────────────────────── */
   .tabs { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 0; padding-left: 4px; }
   .tab-btn {
@@ -162,7 +172,6 @@
     box-shadow: 0 26px 60px rgba(0,0,0,.6), inset 0 0 110px rgba(95,70,30,.26), inset 0 0 0 1px rgba(120,90,40,.22);
     isolation: isolate;
   }
-  /* Papierfaser-Textur */
   .card::before {
     content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 0;
     opacity: .5; mix-blend-mode: multiply;
@@ -170,7 +179,6 @@
   }
   .card > * { position: relative; z-index: 1; }
 
-  /* Art-déco Eckwinkel */
   .corner { position: absolute; width: 38px; height: 38px; color: var(--brass-dim); opacity: .85; pointer-events: none; z-index: 2; }
   .corner.tl { top: 10px; left: 10px; }
   .corner.tr { top: 10px; right: 10px; transform: scaleX(-1); }
@@ -210,11 +218,11 @@
   .player-row input { width: 21px; height: 21px; accent-color: var(--teal); cursor: pointer; flex: 0 0 auto; }
   .player-row .pc { font-weight: 600; letter-spacing: .3px; }
   .player-row .pl { color: var(--ink-soft); font-size: 14px; font-style: italic; }
+  .players-empty { font-family: var(--type); font-size: 13px; color: var(--ink-soft); font-style: italic; line-height: 1.7; padding: 26px 6px; text-align: center; }
 
   /* ── Aktionen ─────────────────────────────────────────────────────────────── */
   .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 26px; }
 
-  /* Wachssiegel-Speichern */
   .btn-primary {
     display: inline-flex; align-items: center; gap: 18px;
     text-decoration: none; cursor: pointer; padding: 0; background: none; border: none;
@@ -229,7 +237,6 @@
       0 8px 20px rgba(0,0,0,.55),
       inset 0 3px 6px rgba(255,180,160,.4),
       inset 0 -6px 12px rgba(0,0,0,.5);
-    /* unregelmäßiger, gegossener Wachsrand */
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23000' d='M50 2c7 0 9 6 16 7s11-3 15 3 0 11 4 16 9 6 8 13-7 8-8 15 4 11-1 16-11 1-16 5-7 9-14 9-10-5-17-5-11 5-17 4-7-7-13-10-12-1-15-7 4-11 3-17-6-9-5-16 7-7 9-13-1-12 5-16 11 1 16-3S43 2 50 2z'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23000' d='M50 2c7 0 9 6 16 7s11-3 15 3 0 11 4 16 9 6 8 13-7 8-8 15 4 11-1 16-11 1-16 5-7 9-14 9-10-5-17-5-11 5-17 4-7-7-13-10-12-1-15-7 4-11 3-17-6-9-5-16 7-7 9-13-1-12 5-16 11 1 16-3S43 2 50 2z'/%3E%3C/svg%3E");
     transition: transform .12s, box-shadow .18s, filter .18s;
@@ -242,7 +249,6 @@
   .btn-primary:hover .seal { box-shadow: 0 12px 26px rgba(124,43,33,.5), inset 0 3px 6px rgba(255,180,160,.45), inset 0 -6px 12px rgba(0,0,0,.5); filter: brightness(1.06); }
   .btn-primary:active .seal { transform: translateY(3px) scale(.96); box-shadow: 0 3px 9px rgba(0,0,0,.5), inset 0 2px 5px rgba(255,180,160,.35), inset 0 -4px 9px rgba(0,0,0,.55); }
 
-  /* Stempel-/Akten-Buttons */
   .btn-ghost {
     display: inline-flex; align-items: center; gap: 9px; font-family: var(--type); font-size: 12.5px; letter-spacing: .8px;
     padding: 12px 17px; border-radius: 4px; cursor: pointer; text-transform: uppercase;
@@ -310,7 +316,7 @@
     <div style="flex:1">
       <h1>Investigator&rsquo;s Journal</h1>
       <p class="tagline">&mdash; Vertrauliche Ermittlerakte &middot; Arkham, 1933 &mdash;</p>
-      <p class="target">Ablage: <span id="targetLabel">Fipsi DnD / Claude Notizen</span></p>
+      <p class="target">Ablage: <span id="targetLabel">— in den Einstellungen festlegen —</span></p>
     </div>
     <div class="stamp">VERTRAULICH</div>
     <button class="icon-btn" id="settingsToggle" title="Einstellungen">
@@ -327,17 +333,23 @@
   <div class="panel hidden" id="settingsPanel">
     <div class="panel-title">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.5 12.5 L20 3 M16 4 l3 0 0 3 M14 6.5 l2 2"/></svg>
-      Ziel im Vault
+      Einrichtung
     </div>
+    <p class="onboard">Willkommen, Ermittler. Diese Einstellungen werden nur lokal in deinem Browser gespeichert. Trage deinen eigenen Obsidian-Vault, einen (in Obsidian bereits vorhandenen) Zielordner und deine Mitspieler ein.</p>
     <div class="field">
       <label>Vault-Name (exakt wie in Obsidian)</label>
-      <input type="text" id="vault" />
+      <input type="text" id="vault" placeholder="z. B. Mein Vault" />
     </div>
     <div class="field">
       <label>Zielordner (muss in Obsidian existieren, leer = Wurzel)</label>
-      <input type="text" id="folder" placeholder="z. B. Claude Notizen" />
+      <input type="text" id="folder" placeholder="z. B. Cthulhu Notizen" />
     </div>
-    <p class="hint" style="margin:0">Neue Seite wird angelegt als: <code id="pathPreview"></code></p>
+    <div class="field">
+      <label>Spieler (erscheinen im „Spieler“-Tab als ankreuzbare Liste)</label>
+      <div class="roster-list" id="rosterList"></div>
+      <button class="add-player" id="addPlayerBtn" type="button">+ Spieler hinzufügen</button>
+    </div>
+    <p class="hint" style="margin:6px 0 0">Neue Seite wird angelegt als: <code id="pathPreview"></code></p>
   </div>
 
   <div class="tabs" id="tabs"></div>
@@ -415,14 +427,6 @@
 (function () {
   "use strict";
 
-  var PLAYERS = [
-    { id: "gustav",    char: "Gustav",    player: "Ich" },
-    { id: "werner",    char: "Werner",    player: "Nico" },
-    { id: "friedrich", char: "Friedrich", player: "Julius" },
-    { id: "frederike", char: "Frederike", player: "Juli" },
-    { id: "mathilda",  char: "Mathilda",  player: "Mimi" }
-  ];
-
   var NOTE_TYPES = [
     { id: "spieler",    label: "Spieler", kind: "players" },
     { id: "sitzung",    label: "Sitzungsprotokoll" },
@@ -433,16 +437,25 @@
     { id: "handout",    label: "Handout" }
   ];
 
-  var SETTINGS_KEY = "ij_settings_v4";
-  var DRAFT_KEY = "ij_draft_v4";
+  var SETTINGS_KEY = "ij_settings_v5";
+  var DRAFT_KEY = "ij_draft_v5";
+
+  var DEFAULT_ROSTER = [
+    { id: "gustav",    char: "Gustav",    player: "Ich" },
+    { id: "werner",    char: "Werner",    player: "Nico" },
+    { id: "friedrich", char: "Friedrich", player: "Julius" },
+    { id: "frederike", char: "Frederike", player: "Juli" },
+    { id: "mathilda",  char: "Mathilda",  player: "Mimi" }
+  ];
 
   var state = {
     vault: "Fipsi DnD",
     folder: "Claude Notizen",
+    roster: DEFAULT_ROSTER.map(function (p) { return { id: p.id, char: p.char, player: p.player }; }),   // [{ id, char, player }]
     title: "",
     tags: "",
     activeTab: "spieler",
-    players: { gustav: false, werner: false, friedrich: false, frederike: false, mathilda: false },
+    players: {},   // { rosterId: bool }
     sections: { sitzung: "", npc: "", schauplatz: "", hinweis: "", mythos: "", handout: "" }
   };
 
@@ -451,6 +464,8 @@
     settingsPanel: document.getElementById("settingsPanel"),
     vault: document.getElementById("vault"),
     folder: document.getElementById("folder"),
+    rosterList: document.getElementById("rosterList"),
+    addPlayerBtn: document.getElementById("addPlayerBtn"),
     targetLabel: document.getElementById("targetLabel"),
     pathPreview: document.getElementById("pathPreview"),
     tabs: document.getElementById("tabs"),
@@ -470,16 +485,36 @@
     toast: document.getElementById("toast")
   };
 
+  function genId() { return "p_" + Math.random().toString(36).slice(2, 9); }
+
   // --- Persistenz ---
   function loadState() {
+    var loaded = false;
     try {
       var raw = localStorage.getItem(SETTINGS_KEY);
       if (raw) {
         var s = JSON.parse(raw);
-        if (s.vault) state.vault = s.vault;
+        if (typeof s.vault === "string") state.vault = s.vault;
         if (typeof s.folder === "string") state.folder = s.folder;
+        if (Array.isArray(s.roster)) {
+          state.roster = s.roster.map(function (p) {
+            return { id: p.id || genId(), char: p.char || "", player: p.player || "" };
+          });
+        }
+        loaded = true;
       }
     } catch (e) {}
+    // Sanfte Übernahme aus der Vorgängerversion (nur Vault/Ordner)
+    if (!loaded) {
+      try {
+        var old = localStorage.getItem("ij_settings_v4");
+        if (old) {
+          var o = JSON.parse(old);
+          if (typeof o.vault === "string") state.vault = o.vault;
+          if (typeof o.folder === "string") state.folder = o.folder;
+        }
+      } catch (e) {}
+    }
     try {
       var rawD = localStorage.getItem(DRAFT_KEY);
       if (rawD) {
@@ -487,9 +522,7 @@
         if (d.title) state.title = d.title;
         if (d.tags) state.tags = d.tags;
         if (d.activeTab) state.activeTab = d.activeTab;
-        if (d.players) {
-          PLAYERS.forEach(function (p) { if (typeof d.players[p.id] === "boolean") state.players[p.id] = d.players[p.id]; });
-        }
+        if (d.players && typeof d.players === "object") state.players = d.players;
         if (d.sections) {
           for (var k in state.sections) {
             if (typeof d.sections[k] === "string") state.sections[k] = d.sections[k];
@@ -499,7 +532,7 @@
     } catch (e) {}
   }
   function saveSettings() {
-    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ vault: state.vault, folder: state.folder })); } catch (e) {}
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ vault: state.vault, folder: state.folder, roster: state.roster })); } catch (e) {}
   }
   function saveDraft() {
     try {
@@ -520,6 +553,15 @@
   function nowStamp() { var d = new Date(); return todayISO() + " " + pad(d.getHours()) + pad(d.getMinutes()); }
   function sanitizeFilename(s) { return s.replace(/[\\/:*?"<>|#^[\]]/g, "").replace(/\s+/g, " ").trim(); }
 
+  function displayName(p) {
+    var c = (p.char || "").trim();
+    var pl = (p.player || "").trim();
+    return pl ? (c + " (" + pl + ")") : c;
+  }
+  function validRoster() {
+    return state.roster.filter(function (p) { return (p.char || "").trim() !== ""; });
+  }
+
   function parseTags() {
     return state.tags.split(/[,\s]+/).map(function (t) { return t.replace(/^#/, "").trim(); }).filter(Boolean);
   }
@@ -531,12 +573,11 @@
   function effectiveTitle() { return state.title.trim() || ("Notiz " + nowStamp()); }
 
   function anyPlayerChecked() {
-    for (var i = 0; i < PLAYERS.length; i++) { if (state.players[PLAYERS[i].id]) return true; }
-    return false;
+    return validRoster().some(function (p) { return state.players[p.id]; });
   }
   function buildPlayersList() {
-    return PLAYERS.filter(function (p) { return state.players[p.id]; })
-      .map(function (p) { return "- " + p.char + " (" + p.player + ")"; })
+    return validRoster().filter(function (p) { return state.players[p.id]; })
+      .map(function (p) { return "- " + displayName(p); })
       .join("\n");
   }
   function sectionHasContent(t) {
@@ -575,6 +616,11 @@
            "&content=" + encodeURIComponent(buildFullContent());
   }
 
+  function openSettings() {
+    el.settingsPanel.classList.remove("hidden");
+    el.settingsToggle.classList.add("active");
+  }
+
   // --- Toast ---
   var toastTimer = null;
   function showToast(type, msg) {
@@ -584,6 +630,40 @@
   }
 
   // --- Render ---
+  function renderRoster() {
+    el.rosterList.innerHTML = "";
+    state.roster.forEach(function (p) {
+      var row = document.createElement("div"); row.className = "roster-row";
+      var c = document.createElement("input"); c.type = "text"; c.placeholder = "Charakter"; c.value = p.char || "";
+      c.addEventListener("input", function () {
+        p.char = c.value; saveSettings();
+        renderTabs(); renderPreview(); renderLink();
+        if (state.activeTab === "spieler") renderPlayers();
+      });
+      var pl = document.createElement("input"); pl.type = "text"; pl.placeholder = "Person (optional)"; pl.value = p.player || "";
+      pl.addEventListener("input", function () {
+        p.player = pl.value; saveSettings();
+        renderTabs(); renderPreview(); renderLink();
+        if (state.activeTab === "spieler") renderPlayers();
+      });
+      var rm = document.createElement("button"); rm.type = "button"; rm.className = "roster-remove"; rm.textContent = "×"; rm.title = "Entfernen";
+      rm.addEventListener("click", function () {
+        state.roster = state.roster.filter(function (x) { return x.id !== p.id; });
+        delete state.players[p.id];
+        saveSettings(); saveDraft();
+        renderRoster(); renderTabs(); renderPreview(); renderLink();
+        if (state.activeTab === "spieler") renderPlayers();
+      });
+      row.appendChild(c); row.appendChild(pl); row.appendChild(rm);
+      el.rosterList.appendChild(row);
+    });
+  }
+  function addPlayer() {
+    state.roster.push({ id: genId(), char: "", player: "" });
+    saveSettings();
+    renderRoster();
+    if (state.activeTab === "spieler") renderPlayers();
+  }
   function renderTabs() {
     el.tabs.innerHTML = "";
     NOTE_TYPES.forEach(function (t) {
@@ -605,7 +685,15 @@
   }
   function renderPlayers() {
     el.playersBox.innerHTML = "";
-    PLAYERS.forEach(function (p) {
+    var valid = validRoster();
+    if (valid.length === 0) {
+      var msg = document.createElement("div");
+      msg.className = "players-empty";
+      msg.textContent = "Noch keine Spieler angelegt. Über das Zahnrad oben rechts → „Spieler hinzufügen“ deine Runde eintragen.";
+      el.playersBox.appendChild(msg);
+      return;
+    }
+    valid.forEach(function (p) {
       var row = document.createElement("label");
       row.className = "player-row";
       var cb = document.createElement("input");
@@ -616,8 +704,11 @@
         renderTabs(); renderPreview(); renderLink(); saveDraft();
       });
       var pc = document.createElement("span"); pc.className = "pc"; pc.textContent = p.char;
-      var pl = document.createElement("span"); pl.className = "pl"; pl.textContent = "(" + p.player + ")";
-      row.appendChild(cb); row.appendChild(pc); row.appendChild(pl);
+      row.appendChild(cb); row.appendChild(pc);
+      if ((p.player || "").trim()) {
+        var pl = document.createElement("span"); pl.className = "pl"; pl.textContent = "(" + p.player + ")";
+        row.appendChild(pl);
+      }
       el.playersBox.appendChild(row);
     });
   }
@@ -643,13 +734,13 @@
   }
   function renderPath() {
     el.pathPreview.textContent = buildPath() + ".md";
-    el.targetLabel.textContent = state.vault + " / " + (state.folder.trim() || "(Wurzel)");
+    el.targetLabel.textContent = (state.vault.trim() || "(Vault?)") + " / " + (state.folder.trim() || "(Wurzel)");
   }
   function renderPreview() {
     el.previewBox.textContent = anyFilled() ? buildFullContent() : "(Noch keine Abschnitte ausgefüllt.)";
   }
   function renderLink() {
-    if (anyFilled()) {
+    if (anyFilled() && state.vault.trim()) {
       el.linkPanel.classList.remove("hidden");
       el.rawLink.value = buildUri();
       el.saveBtn.href = buildUri();
@@ -663,7 +754,7 @@
     el.folder.value = state.folder;
     el.title.value = state.title;
     el.tags.value = state.tags;
-    renderTabs(); renderSection(); renderChips(); renderPath(); renderPreview(); renderLink();
+    renderRoster(); renderTabs(); renderSection(); renderChips(); renderPath(); renderPreview(); renderLink();
   }
 
   // --- Aktionen ---
@@ -674,6 +765,12 @@
 
   function saveToObsidian(e) {
     syncCurrent();
+    if (!state.vault.trim()) {
+      if (e) e.preventDefault();
+      showToast("error", "Bitte zuerst den Vault-Namen in den Einstellungen (Zahnrad) eintragen.");
+      openSettings();
+      return;
+    }
     if (!anyFilled()) {
       if (e) e.preventDefault();
       showToast("error", "Es ist noch nichts ausgefüllt – mindestens einen Abschnitt füllen.");
@@ -684,6 +781,7 @@
   }
   function copyLink() {
     syncCurrent();
+    if (!state.vault.trim()) { showToast("error", "Bitte zuerst den Vault-Namen in den Einstellungen eintragen."); openSettings(); return; }
     if (!anyFilled()) { showToast("error", "Es ist noch nichts ausgefüllt."); return; }
     var uri = buildUri();
     function fallback() {
@@ -710,7 +808,7 @@
   }
   function clearAll() {
     state.title = ""; state.tags = "";
-    PLAYERS.forEach(function (p) { state.players[p.id] = false; });
+    state.players = {};
     for (var k in state.sections) { state.sections[k] = ""; }
     try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
     renderAll();
@@ -722,6 +820,7 @@
     el.settingsPanel.classList.toggle("hidden");
     el.settingsToggle.classList.toggle("active");
   });
+  el.addPlayerBtn.addEventListener("click", addPlayer);
   el.vault.addEventListener("input", function () { state.vault = el.vault.value; renderPath(); renderPreview(); renderLink(); saveSettings(); });
   el.folder.addEventListener("input", function () { state.folder = el.folder.value; renderPath(); renderPreview(); renderLink(); saveSettings(); });
   el.title.addEventListener("input", function () { state.title = el.title.value; renderPath(); renderPreview(); renderLink(); saveDraft(); });
@@ -739,6 +838,8 @@
   // --- Start ---
   loadState();
   renderAll();
+  // Erststart: Einstellungen öffnen, wenn noch kein Vault hinterlegt ist.
+  if (!state.vault.trim()) openSettings();
 })();
 </script>
 </body>
